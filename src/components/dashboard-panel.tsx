@@ -1,0 +1,19 @@
+"use client";
+
+import { ArrowRight, Clock } from "@gravity-ui/icons";
+import Link from "next/link";
+import { Bar, BarChart, Cell, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { useEffect, useState } from "react";
+import { AuthGuard } from "@/components/auth-guard";
+import { skillApi } from "@/lib/api";
+import type { DashboardData } from "@/lib/types";
+
+const pieColors = ["#cf4e1e", "#1d1916", "#c9b8aa", "#e7ded0"];
+
+export function DashboardPanel() {
+  const [data, setData] = useState<DashboardData | null>(null); const [error, setError] = useState("");
+  useEffect(() => { skillApi.dashboard().then(setData).catch((requestError: Error) => setError(requestError.message)); }, []);
+  return <AuthGuard><div className="shell page-section dashboard-page"><header className="dashboard-top"><div><p className="eyebrow rust">YOUR TIME, ACCOUNTED FOR</p><h1>Good to see you{data ? `, ${data.member.name.split(" ")[0]}` : ""}.</h1><p>Your balance changes only after a real hour has been confirmed by both people.</p></div><div className="balance-card"><span>Available credits</span><strong>{data?.member.creditBalance ?? "—"}</strong><Link href="/ledger">View ledger <ArrowRight /></Link></div></header>{error ? <div className="inline-message error"><strong>Dashboard unavailable</strong><span>{error}</span></div> : !data ? <div className="dashboard-grid"><div className="skeleton chart-skeleton" /><div className="skeleton chart-skeleton" /></div> : <><div className="dashboard-grid"><section className="chart-card"><div className="chart-heading"><div><p className="eyebrow rust">CREDITS OVER TIME</p><h2>Earned & spent</h2></div></div>{data.creditHistory.length ? <ResponsiveContainer width="100%" height={250}><BarChart data={data.creditHistory}><XAxis dataKey="date" tickLine={false} axisLine={false} tick={{ fontSize: 11, fill: "#706b66" }} /><YAxis allowDecimals={false} tickLine={false} axisLine={false} tick={{ fontSize: 11, fill: "#706b66" }} /><Tooltip cursor={{ fill: "#f8f4ec" }} /><Bar dataKey="earned" name="Earned" fill="#cf4e1e" radius={[5,5,0,0]} /><Bar dataKey="spent" name="Spent" fill="#1d1916" radius={[5,5,0,0]} /></BarChart></ResponsiveContainer> : <ChartEmpty copy="Your credit history will show up after your first completed session." />}</section><section className="chart-card"><div className="chart-heading"><div><p className="eyebrow rust">WHAT YOU TEACH</p><h2>Hours by category</h2></div></div>{data.categoryBreakdown.length ? <ResponsiveContainer width="100%" height={250}><PieChart><Pie data={data.categoryBreakdown} dataKey="value" nameKey="name" innerRadius={58} outerRadius={95} paddingAngle={3}>{data.categoryBreakdown.map((item, index) => <Cell fill={pieColors[index % pieColors.length]} key={item.name} />)}</Pie><Tooltip /></PieChart></ResponsiveContainer> : <ChartEmpty copy="Teach a session to see the categories you are building expertise in." />}</section></div><section className="upcoming-panel"><div className="section-heading"><div><p className="eyebrow rust">NEXT UP</p><h2>Upcoming sessions</h2></div><Link className="text-link" href="/sessions">All sessions →</Link></div>{data.upcomingSessions.length ? <div className="upcoming-list">{data.upcomingSessions.map((session) => <article key={session._id}><span><Clock /> {new Date(session.proposedTime).toLocaleDateString(undefined, { month: "short", day: "numeric" })}</span><strong>{session.skillName}</strong><span>with {session.teacher._id === data.member._id ? session.learner.name : session.teacher.name}</span></article>)}</div> : <div className="empty-panel compact-empty"><p>No confirmed lessons on the calendar. Find a skill worth taking, or list an hour you can teach.</p><Link className="button button-rust" href="/explore">Explore skills</Link></div>}</section></>}</div></AuthGuard>;
+}
+
+function ChartEmpty({ copy }: { copy: string }) { return <div className="chart-empty"><span>0</span><p>{copy}</p></div>; }

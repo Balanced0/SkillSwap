@@ -1,65 +1,99 @@
-import Image from "next/image";
+import { ArrowRight, Clock, Person, Star } from "@gravity-ui/icons";
+import Link from "next/link";
+import { HomeLiveSections } from "@/components/home-live-sections";
+import { SectionHeading } from "@/components/section-heading";
+import { skillCategories } from "@/lib/types";
+
+const categoryDescriptions: Record<(typeof skillCategories)[number], string> = {
+  Music: "Instruments, theory, vocals",
+  Coding: "Programming and dev tools",
+  Language: "Conversation and grammar practice",
+  Design: "UI, brand, illustration",
+  Fitness: "Movement, strength, mobility",
+  Cooking: "Techniques, cuisines, baking",
+  Art: "Drawing, painting, mixed media",
+  Business: "Strategy, marketing, operations",
+  Other: "Practical knowledge worth sharing",
+};
+
+const faqs = [
+  ["What is a credit?", "One credit is one hour of learning. You earn one only after you teach for an hour and both people confirm the session took place."],
+  ["Why do I start with two credits?", "Two welcome credits let you book your first lessons before you have taught. It is the on-ramp to a community where everyone can contribute."],
+  ["How do sessions get confirmed?", "The teacher and learner each confirm completion. Only then does SkillSwap move one credit from the learner to the teacher."],
+  ["Can I teach more than one skill?", "Absolutely. Each skill gets its own listing, availability, level, and description so members know exactly what an hour with you can cover."],
+];
 
 export default function Home() {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <>
+      <section className="hero shell">
+        <p className="eyebrow rust">TIME IS THE CURRENCY</p>
+        <h1>Trade your hours,<br />not your <span>money.</span></h1>
+        <p className="hero-copy">The time-banked barter network. Teach Python for an hour, earn one credit. Spend it to learn cello from an expert. Human exchange, exactly 1:1.</p>
+        <div className="hero-actions">
+          <Link className="button button-rust" href="/register">Start swapping <ArrowRight /></Link>
+          <Link className="button button-outline" href="/how-it-works">How it works</Link>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+        <div className="swap-visual" aria-label="One hour of teaching is equal to one hour of learning">
+          <span>1 hour of</span><strong>Python</strong><i>↔</i><strong>Guitar</strong><span>1 credit moves after both confirm</span>
         </div>
-      </main>
-    </div>
+      </section>
+
+      <HomeLiveSections />
+
+      <section className="section shell how-section" aria-labelledby="how-it-works">
+        <SectionHeading eyebrow="THE SIMPLE PART" title="How SkillSwap works" copy="Three steps. No wallets. No pricing. Just hours." />
+        <div className="steps-grid">
+          <Step number="01" title="List a skill" icon={<Star />} copy="Publish what you can teach in a one-hour block. From watercolour to Kubernetes." />
+          <Step number="02" title="Get matched" icon={<Person />} copy="Learners request a time. You accept, both parties show up, and the hour is yours." />
+          <Step number="03" title="Swap hours" icon={<Clock />} copy="Both confirm the session ended. One credit moves. Ratings settle. Repeat." />
+        </div>
+        <div className="section-cta"><Link className="text-link" href="/how-it-works">See the full flow →</Link></div>
+      </section>
+
+      <section className="section shell categories-section" aria-labelledby="popular-categories">
+        <SectionHeading eyebrow="EQUAL VALUE" title="Popular skill categories" copy="Every kind of hour is worth the same." />
+        <div className="category-grid">
+          {skillCategories.slice(0, 8).map((category, index) => (
+            <Link className="category-card" href={`/explore?category=${encodeURIComponent(category)}`} key={category}>
+              <span className="category-index">0{index + 1}</span>
+              <h3>{category}</h3>
+              <p>{categoryDescriptions[category]}</p>
+              <ArrowRight />
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      <section className="section shell values-section" aria-labelledby="built-on-trust">
+        <SectionHeading eyebrow="BUILT TO BE FAIR" title="Trust is earned in hours" copy="SkillSwap treats the credit ledger like a promise: simple, transparent, and impossible to game alone." />
+        <div className="values-grid">
+          <article><span>01</span><h3>Two-sided completion</h3><p>No one loses a credit until teacher and learner independently say the hour happened.</p></article>
+          <article><span>02</span><h3>Reputation that means something</h3><p>Ratings follow completed swaps, so your track record reflects actual time shared.</p></article>
+          <article><span>03</span><h3>One hour always equals one hour</h3><p>There are no prices, bidding, or hidden fees—only skills, curiosity, and time.</p></article>
+        </div>
+      </section>
+
+      <section className="section shell faq-section" aria-labelledby="faq-heading">
+        <SectionHeading eyebrow="GOOD QUESTIONS" title="Frequently asked" copy="Everything you need to know before your first swap." />
+        <div className="faq-list">
+          {faqs.map(([question, answer]) => <details key={question}><summary>{question}<span>+</span></summary><p>{answer}</p></details>)}
+        </div>
+        <div className="section-cta"><Link className="text-link" href="/faq">Read all FAQs →</Link></div>
+      </section>
+
+      <section className="cta-section">
+        <div className="shell cta-content">
+          <p className="eyebrow rust">YOUR FIRST TWO ARE ON US</p>
+          <h2>Ready to trade an hour?</h2>
+          <p>Sign up and you get two free credits—enough to book your first two lessons before you teach a thing.</p>
+          <Link className="button button-rust" href="/register">Claim your 2 credits <ArrowRight /></Link>
+        </div>
+      </section>
+    </>
   );
+}
+
+function Step({ number, title, copy, icon }: { number: string; title: string; copy: string; icon: React.ReactNode }) {
+  return <article className="step-card"><span className="step-number">{number}</span><div className="step-icon">{icon}</div><h3>{title}</h3><p>{copy}</p></article>;
 }

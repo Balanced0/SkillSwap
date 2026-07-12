@@ -1,36 +1,30 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# SkillSwap web app
 
-## Getting Started
+SkillSwap is a time-banked skill exchange. Members begin with two credits, earn one credit for each confirmed hour they teach, and spend one credit for each confirmed hour they learn. Money never changes hands.
 
-First, run the development server:
+## Run locally
+
+1. Start the API in the sibling `skillswap-server` repository (see its README).
+2. Copy `.env.example` to `.env.local` and change `NEXT_PUBLIC_API_URL` only if the API is not running at `http://localhost:4000/api`.
+3. Install and run:
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open `http://localhost:3000`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## What is included
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- Responsive public landing page, explore filters, listing details, FAQ, terms, and about page.
+- Email/password registration and login, plus a working demo-account entry point.
+- Protected listing creation and management, session requests, dual completion confirmation, reviews, profile editing, dashboard, and time-credit ledger.
+- Recharts dashboard views fed by the API rather than seeded marketplace content.
 
-## Learn More
+## Validate
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+npm run lint
+npm run build
+```
