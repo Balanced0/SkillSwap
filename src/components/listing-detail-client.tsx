@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Avatar } from "@/components/avatar";
 import { ListingCard } from "@/components/listing-card";
-import { getToken, skillApi, type Review } from "@/lib/api";
+import { skillApi, type Review } from "@/lib/api";
 import type { Listing } from "@/lib/types";
 
 export function ListingDetailClient({ id }: { id: string }) {
@@ -21,11 +21,10 @@ export function ListingDetailClient({ id }: { id: string }) {
 
   useEffect(() => { skillApi.listing(id).then((data) => { setListing(data.listing); setReviews(data.reviews); setRelated(data.relatedListings); }).catch((error: Error) => setMessage(error.message)).finally(() => setIsLoading(false)); }, [id]);
   async function requestSession() {
-    if (!getToken()) { router.push(`/login?next=/skills/${id}`); return; }
     if (!proposedTime) { setMessage("Choose a proposed date and time before sending your request."); return; }
     setIsSending(true); setMessage("");
     try { await skillApi.requestSession({ listingId: id, proposedTime }); setMessage("Request sent. Your teacher can now accept or decline it from My sessions."); }
-    catch (error) { setMessage((error as Error).message); }
+    catch (error) { const apiError = error as Error & { status?: number }; if (apiError.status === 401) router.push(`/login?next=/skills/${id}`); else setMessage(apiError.message); }
     finally { setIsSending(false); }
   }
   if (isLoading) return <div className="shell page-loading"><div className="skeleton title" /><div className="skeleton card" /></div>;

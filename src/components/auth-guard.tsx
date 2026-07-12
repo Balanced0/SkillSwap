@@ -2,18 +2,16 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { getToken } from "@/lib/api";
+import { skillApi } from "@/lib/api";
 
 export function AuthGuard({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const [checked, setChecked] = useState(false);
 
   useEffect(() => {
-    if (!getToken()) {
-      router.replace("/login");
-      return;
-    }
-    const timer = window.setTimeout(() => setChecked(true), 0);
+    const timer = window.setTimeout(() => {
+      skillApi.me().then(() => setChecked(true)).catch(() => router.replace("/login"));
+    }, 0);
     return () => window.clearTimeout(timer);
   }, [router]);
 

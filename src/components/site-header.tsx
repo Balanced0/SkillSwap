@@ -4,7 +4,8 @@ import { Bars } from "@gravity-ui/icons";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { clearToken, getToken, skillApi } from "@/lib/api";
+import { authClient } from "@/lib/auth-client";
+import { skillApi } from "@/lib/api";
 import type { Member } from "@/lib/types";
 
 const publicLinks = [
@@ -20,8 +21,8 @@ export function SiteHeader() {
   const [member, setMember] = useState<Member | null>(null);
 
   useEffect(() => {
-    if (!getToken()) return;
-    skillApi.me().then(({ user }) => setMember(user)).catch(clearToken);
+    const timer = window.setTimeout(() => skillApi.me().then(({ user }) => setMember(user)).catch(() => setMember(null)), 0);
+    return () => window.clearTimeout(timer);
   }, [pathname]);
 
   const signedInLinks = member
@@ -33,8 +34,8 @@ export function SiteHeader() {
       ]
     : publicLinks;
 
-  function signOut() {
-    clearToken();
+  async function signOut() {
+    await authClient.signOut();
     setMember(null);
     router.push("/");
   }
@@ -59,7 +60,7 @@ export function SiteHeader() {
               <Link className="profile-link" href="/profile">
                 {member.name.split(" ")[0]}
               </Link>
-              <button className="button button-dark compact" type="button" onClick={signOut}>
+              <button className="button button-dark compact" type="button" onClick={() => { void signOut(); }}>
                 Sign out
               </button>
             </>
@@ -83,7 +84,7 @@ export function SiteHeader() {
           {member ? (
             <>
               <Link href="/profile" onClick={() => setMenuOpen(false)}>Profile</Link>
-              <button type="button" onClick={signOut}>Sign out</button>
+              <button type="button" onClick={() => { void signOut(); }}>Sign out</button>
             </>
           ) : (
             <Link href="/register" onClick={() => setMenuOpen(false)}>Create an account</Link>

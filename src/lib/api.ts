@@ -1,29 +1,16 @@
 import type { DashboardData, Listing, Member, Session, Transaction } from "@/lib/types";
 
 const apiBase = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000/api";
+export const authBase = apiBase.replace(/\/api$/, "");
 
 type ApiError = Error & { status?: number };
 
-export function getToken() {
-  if (typeof window === "undefined") return null;
-  return window.localStorage.getItem("skillswap-token");
-}
-
-export function setToken(token: string) {
-  window.localStorage.setItem("skillswap-token", token);
-}
-
-export function clearToken() {
-  window.localStorage.removeItem("skillswap-token");
-}
-
 export async function api<T>(path: string, options: RequestInit = {}): Promise<T> {
-  const token = getToken();
   const response = await fetch(`${apiBase}${path}`, {
     ...options,
+    credentials: "include",
     headers: {
       "Content-Type": "application/json",
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...options.headers,
     },
   });
@@ -47,11 +34,8 @@ export const skillApi = {
   updateListing: (id: string, data: Record<string, unknown>) => api<{ listing: Listing }>(`/listings/${id}`, { method: "PATCH", body: JSON.stringify(data) }),
   deleteListing: (id: string) => api<{ message: string }>(`/listings/${id}`, { method: "DELETE" }),
   myListings: () => api<{ listings: Listing[] }>("/listings/mine"),
-  register: (data: Record<string, unknown>) => api<{ token: string; user: Member }>("/auth/register", { method: "POST", body: JSON.stringify(data) }),
-  login: (data: Record<string, unknown>) => api<{ token: string; user: Member }>("/auth/login", { method: "POST", body: JSON.stringify(data) }),
-  demoLogin: () => api<{ token: string; user: Member }>("/auth/demo", { method: "POST" }),
-  me: () => api<{ user: Member }>("/auth/me"),
-  updateProfile: (data: Record<string, unknown>) => api<{ user: Member }>("/auth/me", { method: "PATCH", body: JSON.stringify(data) }),
+  me: () => api<{ user: Member }>("/members/me"),
+  updateProfile: (data: Record<string, unknown>) => api<{ user: Member }>("/members/me", { method: "PATCH", body: JSON.stringify(data) }),
   requestSession: (data: { listingId: string; proposedTime: string }) => api<{ session: Session }>("/sessions", { method: "POST", body: JSON.stringify(data) }),
   sessions: () => api<{ sessions: Session[] }>("/sessions/mine"),
   updateSession: (id: string, action: "accept" | "decline" | "cancel" | "confirm-complete") => api<{ session: Session; message: string }>(`/sessions/${id}/${action}`, { method: "POST" }),

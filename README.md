@@ -18,7 +18,7 @@ Open `http://localhost:3000`.
 ## What is included
 
 - Responsive public landing page, explore filters, listing details, FAQ, terms, and about page.
-- Email/password registration and login, plus a working demo-account entry point.
+- Google-only SSO through Better Auth, with MongoDB-backed sessions and a profile created automatically on first sign-in.
 - Protected listing creation and management, session requests, dual completion confirmation, reviews, profile editing, dashboard, and time-credit ledger.
 - Recharts dashboard views fed by the API rather than seeded marketplace content.
 
