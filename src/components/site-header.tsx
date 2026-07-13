@@ -10,6 +10,7 @@ import type { Member } from "@/lib/types";
 
 const publicLinks = [
   ["Explore", "/explore"],
+  ["Learn Board", "/wants"],
   ["How it works", "/how-it-works"],
   ["About", "/about"],
 ] as const;
@@ -28,6 +29,7 @@ export function SiteHeader() {
   const signedInLinks = member
     ? [
         ["Explore", "/explore"],
+        ["Learn Board", "/wants"],
         ["My sessions", "/sessions"],
         ["Ledger", "/ledger"],
         ["Dashboard", "/dashboard"],

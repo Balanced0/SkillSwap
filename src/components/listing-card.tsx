@@ -14,11 +14,13 @@ export function ListingCard({ listing }: { listing: Listing }) {
       <h3>{listing.title}</h3>
       <p className="listing-description">{listing.description}</p>
       <div className="listing-teacher">
-        <Avatar member={listing.teacher} size="sm" />
-        <div>
-          <strong>{listing.teacher.name}</strong>
-          <span>{listing.teacher.location || "SkillSwap member"}</span>
-        </div>
+        <Link href={`/members/${listing.teacher._id}`} className="flex items-center gap-2 text-inherit hover:opacity-85">
+          <Avatar member={listing.teacher} size="sm" />
+          <div>
+            <strong>{listing.teacher.name}</strong>
+            <span>{listing.teacher.location || "SkillSwap member"}</span>
+          </div>
+        </Link>
         {rating > 0 ? <span className="rating"><Star /> {rating.toFixed(1)}</span> : <span className="new-member">New member</span>}
       </div>
       <Link href={`/skills/${listing._id}`} className="card-link">

@@ -74,3 +74,13 @@ export type DashboardData = {
   creditHistory: Array<{ date: string; earned: number; spent: number }>;
   categoryBreakdown: Array<{ name: string; value: number }>;
 };
+
+export type Want = {
+  _id: string;
+  skillName: string;
+  category: SkillCategory;
+  description: string;
+  createdAt: string;
+  user: Pick<Member, "_id" | "name" | "avatarUrl" | "location">;
+};
+

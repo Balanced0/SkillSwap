@@ -1,4 +1,4 @@
-import type { DashboardData, Listing, Member, Session, Transaction } from "@/lib/types";
+import type { DashboardData, Listing, Member, Session, Transaction, Want } from "@/lib/types";
 
 const apiBase = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000/api";
 export const authBase = apiBase.replace(/\/api$/, "");
@@ -36,6 +36,12 @@ export const skillApi = {
   myListings: () => api<{ listings: Listing[] }>("/listings/mine"),
   me: () => api<{ user: Member }>("/members/me"),
   updateProfile: (data: Record<string, unknown>) => api<{ user: Member }>("/members/me", { method: "PATCH", body: JSON.stringify(data) }),
+  memberProfile: (id: string) => api<{ user: Member }>(`/members/${id}`),
+  memberListings: (id: string) => api<{ listings: Listing[] }>(`/members/${id}/listings`),
+  memberReviews: (id: string) => api<{ reviews: Review[] }>(`/members/${id}/reviews`),
+  wants: (query = "") => api<{ wants: Want[]; page: number; pages: number; total: number }>(`/wants${query}`),
+  createWant: (data: { skillName: string; category: string; description: string }) => api<{ want: Want }>("/wants", { method: "POST", body: JSON.stringify(data) }),
+  deleteWant: (id: string) => api<{ message: string }>(`/wants/${id}`, { method: "DELETE" }),
   requestSession: (data: { listingId: string; proposedTime: string }) => api<{ session: Session }>("/sessions", { method: "POST", body: JSON.stringify(data) }),
   sessions: () => api<{ sessions: Session[] }>("/sessions/mine"),
   updateSession: (id: string, action: "accept" | "decline" | "cancel" | "confirm-complete") => api<{ session: Session; message: string }>(`/sessions/${id}/${action}`, { method: "POST" }),
