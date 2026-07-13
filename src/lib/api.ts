@@ -26,7 +26,7 @@ export async function api<T>(path: string, options: RequestInit = {}): Promise<T
 }
 
 export const skillApi = {
-  stats: () => api<{ hoursSwapped: number; sessionsCompleted: number; skillsListed: number; members: number }>("/platform/stats"),
+  stats: () => api<{ hoursSwapped: number; sessionsCompleted: number; skillsListed: number; members: number }>("/stats"),
   featuredListings: () => api<{ listings: Listing[] }>("/listings?limit=4&sort=rating"),
   listings: (query = "") => api<{ listings: Listing[]; page: number; pages: number; total: number }>(`/listings${query}`),
   listing: (id: string) => api<{ listing: Listing; reviews: Review[]; relatedListings: Listing[] }>(`/listings/${id}`),

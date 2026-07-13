@@ -17,12 +17,14 @@ export function HomeLiveSections() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    Promise.all([skillApi.stats(), skillApi.featuredListings()])
+    Promise.all([
+      skillApi.stats().catch(() => initialStats),
+      skillApi.listings("?limit=4&sort=rating").catch(() => ({ listings: [] as Listing[], page: 1, pages: 1, total: 0 })),
+    ])
       .then(([platformStats, featured]) => {
         setStats(platformStats);
         setListings(featured.listings);
       })
-      .catch(() => undefined)
       .finally(() => setIsLoading(false));
   }, []);
 
@@ -53,7 +55,7 @@ export function HomeLiveSections() {
           <div className="empty-panel compact-empty">
             <h3>No listings yet</h3>
             <p>SkillSwap starts with its members. Be the first to offer an hour of what you know.</p>
-            <Link className="button button-rust" href="/register">Create your account</Link>
+            <Link className="button button-rust" href="/listings/add">List a skill →</Link>
           </div>
         )}
       </section>
