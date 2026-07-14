@@ -58,12 +58,12 @@ export function AuthForm({ mode }: { mode: "login" | "register" }) {
           email,
           password,
           name,
-          callbackURL: `${window.location.origin}/dashboard`,
         });
         if (response.error) {
           setError(response.error.message ?? "Registration failed.");
         } else {
-          window.location.href = "/dashboard";
+          setMessage("Account created! Redirecting you to sign in…");
+          window.setTimeout(() => { window.location.href = "/login"; }, 1500);
         }
       }
     } catch (err) {
