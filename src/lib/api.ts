@@ -42,7 +42,7 @@ export const skillApi = {
   wants: (query = "") => api<{ wants: Want[]; page: number; pages: number; total: number }>(`/wants${query}`),
   createWant: (data: { skillName: string; category: string; description: string }) => api<{ want: Want }>("/wants", { method: "POST", body: JSON.stringify(data) }),
   deleteWant: (id: string) => api<{ message: string }>(`/wants/${id}`, { method: "DELETE" }),
-  requestSession: (data: { listingId: string; proposedTime: string }) => api<{ session: Session }>("/sessions", { method: "POST", body: JSON.stringify(data) }),
+  requestSession: (data: { listingId: string; proposedTime: string; learnerId?: string }) => api<{ session: Session }>("/sessions", { method: "POST", body: JSON.stringify(data) }),
   sessions: () => api<{ sessions: Session[] }>("/sessions/mine"),
   updateSession: (id: string, action: "accept" | "decline" | "cancel" | "confirm-complete") => api<{ session: Session; message: string }>(`/sessions/${id}/${action}`, { method: "POST" }),
   dashboard: () => api<DashboardData>("/dashboard"),

@@ -24,6 +24,14 @@ export function WantsBoard() {
   const [form, setForm] = useState({ skillName: "", category: "Coding", description: "" });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // Propose session state
+  const [proposingSession, setProposingSession] = useState<{ wantId: string; learnerId: string; learnerName: string; skillName: string } | null>(null);
+  const [myListings, setMyListings] = useState<any[]>([]);
+  const [selectedListingId, setSelectedListingId] = useState("");
+  const [proposedTime, setProposedTime] = useState("");
+  const [proposeMessage, setProposeMessage] = useState("");
+  const [isProposing, setIsProposing] = useState(false);
+
   useEffect(() => {
     // Load logged in user
     skillApi.me().then(({ user }) => setMember(user)).catch(() => setMember(null));
@@ -91,6 +99,57 @@ export function WantsBoard() {
     }
   }
 
+  const startProposing = (want: Want) => {
+    if (!member) {
+      window.location.href = `/login?next=/wants`;
+      return;
+    }
+    setProposingSession({
+      wantId: want._id,
+      learnerId: want.user._id,
+      learnerName: want.user.name,
+      skillName: want.skillName,
+    });
+    setProposeMessage("");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    // Fetch my listings
+    skillApi.myListings().then((data) => {
+      const active = data.listings.filter(l => l.status === "Active");
+      setMyListings(active);
+      if (active.length > 0) {
+        setSelectedListingId(active[0]._id);
+      } else {
+        setSelectedListingId("");
+      }
+    }).catch(() => {
+      setMyListings([]);
+      setSelectedListingId("");
+    });
+  };
+
+  const submitProposal = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedListingId || !proposedTime || !proposingSession) return;
+    setIsProposing(true);
+    setProposeMessage("");
+    try {
+      await skillApi.requestSession({
+        listingId: selectedListingId,
+        proposedTime,
+        learnerId: proposingSession.learnerId,
+      });
+      setProposeMessage("Offer sent! The learner can now accept or decline it from their sessions page.");
+      setTimeout(() => {
+        setProposingSession(null);
+        setProposedTime("");
+      }, 3000);
+    } catch (err: any) {
+      setProposeMessage(err.message || "Failed to send teaching offer.");
+    } finally {
+      setIsProposing(false);
+    }
+  };
+
   return (
     <div className="shell page-section wants-page">
       <header className="page-heading page-heading-row">
@@ -157,6 +216,67 @@ export function WantsBoard() {
               </button>
             </div>
           </form>
+        </section>
+      )}
+
+      {proposingSession && (
+        <section className="form-section shadow-sm border border-beige p-6 rounded-lg mb-8" style={{ background: "#fdfbf7", marginBottom: "2rem", padding: "2rem", borderRadius: "8px", border: "1px solid #e7ded0" }}>
+          <h2 style={{ fontSize: "1.5rem", marginBottom: "0.5rem" }}>Offer to teach {proposingSession.learnerName}</h2>
+          <p style={{ color: "#706b66", marginBottom: "1.5rem" }}>Propose one of your active listings to teach them <strong>{proposingSession.skillName}</strong>.</p>
+          
+          {proposeMessage && (
+            <p className={`form-message ${proposeMessage.includes("sent") ? "success" : "error"}`} style={{ marginBottom: "1.5rem" }}>
+              {proposeMessage}
+            </p>
+          )}
+
+          {myListings.length === 0 ? (
+            <div style={{ padding: "1rem 0" }}>
+              <p style={{ marginBottom: "1rem" }}>You don’t have any active listings to offer. Please list a skill in the marketplace first.</p>
+              <Link href="/listings/add" className="button button-rust">
+                Create a listing
+              </Link>
+              <button className="button button-outline" type="button" onClick={() => setProposingSession(null)} style={{ marginLeft: "1rem" }}>
+                Cancel
+              </button>
+            </div>
+          ) : (
+            <form onSubmit={submitProposal} className="editor-form">
+              <div className="field-row" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem", marginBottom: "1rem" }}>
+                <label className="form-label">
+                  Select your skill listing
+                  <select
+                    required
+                    value={selectedListingId}
+                    onChange={(e) => setSelectedListingId(e.target.value)}
+                  >
+                    {myListings.map((listing) => (
+                      <option key={listing._id} value={listing._id}>
+                        {listing.title} ({listing.category})
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label className="form-label">
+                  Propose a date & time
+                  <input
+                    type="datetime-local"
+                    required
+                    value={proposedTime}
+                    onChange={(e) => setProposedTime(e.target.value)}
+                  />
+                </label>
+              </div>
+              <div className="form-actions" style={{ display: "flex", gap: "1rem", marginTop: "1rem" }}>
+                <button className="button button-rust" type="submit" disabled={isProposing || !selectedListingId || !proposedTime}>
+                  {isProposing ? "Sending offer..." : "Send teaching offer"}
+                </button>
+                <button className="button button-outline" type="button" onClick={() => setProposingSession(null)}>
+                  Cancel
+                </button>
+              </div>
+            </form>
+          )}
         </section>
       )}
 
@@ -233,9 +353,13 @@ export function WantsBoard() {
                         <TrashBin /> Remove
                       </button>
                     ) : (
-                      <Link href={`/members/${want.user._id}`} className="button button-dark compact" style={{ padding: "0.4rem 0.8rem", fontSize: "0.85rem" }}>
+                      <button
+                        onClick={() => startProposing(want)}
+                        className="button button-dark compact"
+                        style={{ padding: "0.4rem 0.8rem", fontSize: "0.85rem" }}
+                      >
                         Offer to teach
-                      </Link>
+                      </button>
                     )}
                   </div>
                 </article>

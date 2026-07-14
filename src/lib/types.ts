@@ -52,6 +52,7 @@ export type Session = {
   proposedTime: string;
   durationHours: number;
   status: "Requested" | "Confirmed" | "Completed" | "Cancelled" | "Declined";
+  proposedBy?: "Teacher" | "Learner";
   teacherConfirmedComplete: boolean;
   learnerConfirmedComplete: boolean;
   createdAt: string;

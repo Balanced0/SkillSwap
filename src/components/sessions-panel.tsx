@@ -22,7 +22,22 @@ function SessionGroup({ title, copy, sessions, member, onAction, reviewing, setR
 }
 
 function SessionActions({ session, isTeacher, onAction, onReview }: { session: Session; isTeacher: boolean; onAction: (id: string, action: "accept" | "decline" | "cancel" | "confirm-complete") => void; onReview: () => void }) {
-  if (session.status === "Requested") return <div className="session-actions">{isTeacher ? <><button className="button button-rust compact" type="button" onClick={() => onAction(session._id, "accept")}>Accept</button><button className="text-button" type="button" onClick={() => onAction(session._id, "decline")}>Decline</button></> : <button className="text-button" type="button" onClick={() => onAction(session._id, "cancel")}>Cancel request</button>}</div>;
+  if (session.status === "Requested") {
+    const proposedBy = session.proposedBy || "Learner";
+    const isRecipient = (proposedBy === "Teacher" && !isTeacher) || (proposedBy === "Learner" && isTeacher);
+    return (
+      <div className="session-actions">
+        {isRecipient ? (
+          <>
+            <button className="button button-rust compact" type="button" onClick={() => onAction(session._id, "accept")}>Accept</button>
+            <button className="text-button" type="button" onClick={() => onAction(session._id, "decline")}>Decline</button>
+          </>
+        ) : (
+          <button className="text-button" type="button" onClick={() => onAction(session._id, "cancel")}>Cancel request</button>
+        )}
+      </div>
+    );
+  }
   if (session.status === "Confirmed") return <div className="session-actions"><button className="button button-rust compact" type="button" onClick={() => onAction(session._id, "confirm-complete")}>{isTeacher ? (session.teacherConfirmedComplete ? "You confirmed completion" : "Confirm session complete") : (session.learnerConfirmedComplete ? "You confirmed completion" : "Confirm session complete")}</button><span className="confirmation-note">{session.teacherConfirmedComplete && session.learnerConfirmedComplete ? "Credit transferred" : "Waiting for both confirmations"}</span></div>;
   if (session.status === "Completed") return <div className="session-actions"><span className="confirmation-note">Swap complete · credit transferred</span><button className="text-button" type="button" onClick={onReview}>Leave a review</button></div>;
   if (session.status === "Declined") return <div className="session-actions"><span className="confirmation-note text-red-500" style={{ color: "#d9383a" }}>Request declined. No credits moved.</span></div>;
