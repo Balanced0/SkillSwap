@@ -3,6 +3,7 @@ import Link from "next/link";
 import { HomeLiveSections } from "@/components/home-live-sections";
 import { SectionHeading } from "@/components/section-heading";
 import { skillCategories } from "@/lib/types";
+import { HeroInteractive } from "@/components/hero-interactive";
 
 const categoryDescriptions: Record<(typeof skillCategories)[number], string> = {
   Music: "Instruments, theory, vocals",
@@ -26,17 +27,15 @@ const faqs = [
 export default function Home() {
   return (
     <>
-      <section className="hero shell">
+      <section className="hero shell" style={{ gap: "2rem" }}>
         <p className="eyebrow rust">TIME IS THE CURRENCY</p>
         <h1>Trade your hours,<br />not your <span>money.</span></h1>
         <p className="hero-copy">The time-banked barter network. Teach Python for an hour, earn one credit. Spend it to learn cello from an expert. Human exchange, exactly 1:1.</p>
-        <div className="hero-actions">
+        <div className="hero-actions" style={{ marginBottom: "1rem" }}>
           <Link className="button button-rust" href="/register">Start swapping <ArrowRight /></Link>
           <Link className="button button-outline" href="/how-it-works">How it works</Link>
         </div>
-        <div className="swap-visual" aria-label="One hour of teaching is equal to one hour of learning">
-          <span>1 hour of</span><strong>Python</strong><i>↔</i><strong>Guitar</strong><span>1 credit moves after both confirm</span>
-        </div>
+        <HeroInteractive />
       </section>
 
       <HomeLiveSections />
